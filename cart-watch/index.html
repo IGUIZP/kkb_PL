@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>购物车</title>
+  <style>
+    .active {
+      background-color: #ddd;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <h2 :title="title">
+      {{title}}
+    </h2>
+    <p>
+      <input type="text" v-model="course" @keydown.enter="addCourses">
+      <button @click="addCourses">新增</button>
+    </p>
+    <p v-if="courses.length === 0">没有任何课程信息</p>
+    <div v-else class="courseList">
+      <div v-for="c in courses" :key="c" :class="{active: selectedCourse === c}" @click="selectedCourse = c">
+        {{ c }}
+      </div>
+    </div>
+
+    <p>
+      <!-- 课程总数：{{ courses.length }} 门 -->
+      <!-- 课程总数：{{ total }} 门 -->
+      课程总数：{{ totalCount }} 门
+    </p>
+
+  </div>
+
+  <script src="/core/vue.js"></script>
+  <script>
+    // 模拟数据调用
+    function getCourses() {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(['web全栈', 'web高级' ])
+        }, 2000)
+      })
+    }
+    const app = new Vue({
+      el: "#app",
+      data() {
+        return {
+          title: '购物车',
+          course: '',
+          totalCount: 0,
+          selectedCourse: '',
+          courses: [ ]
+        }
+      },
+      async created () {
+        //组件实例已经创建，未挂载，dom不存在
+        this.courses = await getCourses()
+      },
+      // mounted () {
+        //dom已经存在，可以访问dom
+      //   ;
+      // },
+      methods: {
+        addCourses() {
+          if (!this.course) return
+          this.courses.push(this.course)
+          this.course = ''
+        }
+      },
+      computed: {
+        // 计算属性有缓存性：如果值没有发生改变，则页面不会重新渲染
+        total() {
+          return this.courses.length 
+        }
+      },
+      // watch: {
+      //   courses(newValue, oldValue) {
+      //     this.totalCount = newValue.length
+      //   }
+      // },
+      watch: {
+        courses: {
+          //立即执行
+          immediate: true,
+          //针对复杂对象属性，进行对象内部数据进行监听
+          deep: true,
+          handler(newValue, oldValue) {
+            this.totalCount = newValue.length
+          }
+        }
+      },
+    })
+  </script>
+</body>
+
+</html>

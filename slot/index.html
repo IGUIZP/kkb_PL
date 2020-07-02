@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>购物车</title>
+  <style>
+    .active {
+      background-color: #ddd;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <h2 :title="title">
+      {{title}}
+    </h2>
+    <courses-add v-model="course" @add-courses="addCourses" ></courses-add>
+
+    <courses-list :courses="courses"></courses-list>
+    <p>
+      <!-- 课程总数：{{ courses.length }} 门 -->
+      <!-- 课程总数：{{ total }} 门 -->
+      课程总数：{{ totalCount }} 门
+    </p>
+
+  </div>
+
+  <script src="/core/vue.js"></script>
+  <script type="module">
+    Vue.component('courses-add', {
+      template: `
+      <p>
+        <input type="text" :value="value" @keydown.enter="addCourses" @input="onInput">
+        <button @click="addCourses">新增</button>
+      </p>
+      `,
+      props: ['value'],
+      methods: {
+        addCourses() {
+          this.$emit('add-courses')
+        },
+        onInput(e) {
+          this.$emit('input', e.target.value)
+        }
+      },
+    })
+    Vue.component('courses-list', {
+      template: `
+      <div>
+        <p v-if="courses.length === 0">没有任何课程信息</p>
+        <div v-else class="courseList">
+          <div
+            v-for="c in courses"
+            :key="c"
+            :class="{active: selectedCourse === c}"
+            @click="selectedCourse = c"
+          >{{ c }}</div>
+        </div>
+      </div>
+      `,
+      props: {
+        courses: {
+          type: Array,
+          default: []
+        }
+      },
+      data: () => {
+        return {
+          selectedCourse: ''
+        };
+      }
+    })
+    const app = new Vue({
+      el: "#app",
+      data() {
+        return {
+          title: '购物车',
+          totalCount: 0,
+          course: '',
+          courses: [ 'web全栈', 'web高级' ]
+        }
+      },
+      methods: {
+        addCourses() {
+          if (!this.course) return
+          this.courses.push(this.course)
+          this.course = ''
+        }
+      },
+      computed: {
+        // 计算属性有缓存性：如果值没有发生改变，则页面不会重新渲染
+        total() {
+          return this.courses.length
+        }
+      },
+      // watch: {
+      //   courses(newValue, oldValue) {
+      //     this.totalCount = newValue.length
+      //   }
+      // },
+      watch: {
+        courses: {
+          //立即执行
+          immediate: true,
+          //针对复杂对象属性，进行对象内部数据进行监听
+          deep: true,
+          handler(newValue, oldValue) {
+            this.totalCount = newValue.length
+          }
+        }
+      },
+    })
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>购物车</title>
+  <style>
+    .active {
+      background-color: #ddd;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <h2 :title="title">
+      {{title}}
+    </h2>
+    <p>
+      <input type="text" v-model="course" @keydown.enter="addCourses">
+      <button @click="addCourses">新增</button>
+    </p>
+    <p v-if="courses.length === 0">没有任何课程信息</p>
+    <div v-else class="courseList">
+      <div v-for="c in courses" :key="c" :class="{active: selectedCourse === c}" @click="selectedCourse = c">
+        {{ c }}
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/core/vue.js"></script>
+  <script>
+    const app = new Vue({
+      el: "#app",
+      data() {
+        return {
+          title: '购物车',
+          course: '',
+          selectedCourse: '',
+          courses: [ 'web全栈', 'web高级' ]
+        }
+      },
+      methods: {
+        addCourses() {
+          this.courses.push(this.course)
+          this.course = ''
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
