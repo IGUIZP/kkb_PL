@@ -9,15 +9,35 @@
     .active {
       background-color: #ddd;
     }
+
+    .message-box {
+      padding: 10px20px;
+      background: #4fc08d;
+      border: 1pxsolid#42b983;
+    }
+
+    .message-box-close {
+      float: right;
+    }
   </style>
 </head>
 
 <body>
   <div id="app">
+    <!-- <message :show="show" @close="show=$event">恭喜</message> -->
+    <message :show.sync="show">
+      <template v-slot:title>
+        <strong>恭喜</strong>
+      </template>
+      <template>
+        新增成功
+      </template>
+      
+    </message>
     <h2 :title="title">
       {{title}}
     </h2>
-    <courses-add v-model="course" @add-courses="addCourses" ></courses-add>
+    <courses-add v-model="course" @add-courses="addCourses"></courses-add>
 
     <courses-list :courses="courses"></courses-list>
     <p>
@@ -29,6 +49,7 @@
   </div>
 
   <script src="/core/vue.js"></script>
+  <script src="message.js"></script>
   <script type="module">
     Vue.component('courses-add', {
       template: `
@@ -37,7 +58,7 @@
         <button @click="addCourses">新增</button>
       </p>
       `,
-      props: ['value'],
+      props: [ 'value' ],
       methods: {
         addCourses() {
           this.$emit('add-courses')
@@ -77,6 +98,7 @@
       el: "#app",
       data() {
         return {
+          show: false,
           title: '购物车',
           totalCount: 0,
           course: '',
@@ -88,6 +110,7 @@
           if (!this.course) return
           this.courses.push(this.course)
           this.course = ''
+          this.show = true
         }
       },
       computed: {
